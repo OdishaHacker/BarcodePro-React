@@ -13,9 +13,10 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
-        if (!cardRef.current) return;
+        const printElement = document.getElementById(`print-barcode-${index}`);
+        if (!printElement) return;
         try {
-            const canvas = await html2canvas(cardRef.current, { backgroundColor: '#ffffff', scale: 2 });
+            const canvas = await html2canvas(printElement, { backgroundColor: '#ffffff', scale: 2 });
             canvas.toBlob(blob => {
                 if (blob) {
                     navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]).then(() => {
@@ -88,7 +89,7 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
         }
 
         return (
-            <div ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
+            <div id={isPrint ? `print-barcode-${index}` : `barcode-${index}`} ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
                 {!isPrint && <span className="card-index">#{index + 1}</span>}
                 {!isPrint && (
                     <button className="copy-btn" onClick={handleCopy} title="Copy Image">
@@ -116,7 +117,7 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
     }
 
     return (
-        <div ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
+        <div id={isPrint ? `print-barcode-${index}` : `barcode-${index}`} ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
             {!isPrint && <span className="card-index">#{index + 1}</span>}
             {!isPrint && (
                 <button className="copy-btn" onClick={handleCopy} title="Copy Image">
