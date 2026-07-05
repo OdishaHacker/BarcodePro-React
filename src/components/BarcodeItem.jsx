@@ -15,8 +15,16 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
     const handleCopy = async () => {
         const printElement = document.getElementById(`print-barcode-${index}`);
         if (!printElement) return;
+        
+        const printArea = document.querySelector('.print-area');
+        const oldDisplay = printArea ? printArea.style.display : '';
+        if (printArea) printArea.style.display = 'block';
+
         try {
             const canvas = await html2canvas(printElement, { backgroundColor: '#ffffff', scale: 2 });
+            
+            if (printArea) printArea.style.display = oldDisplay;
+            
             canvas.toBlob(blob => {
                 if (blob) {
                     navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]).then(() => {
@@ -26,6 +34,7 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
                 }
             }, 'image/png');
         } catch (e) {
+            if (printArea) printArea.style.display = oldDisplay;
             console.error('Copy failed', e);
             // fallback to text copy
             navigator.clipboard.writeText(code);
