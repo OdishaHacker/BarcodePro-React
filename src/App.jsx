@@ -107,7 +107,8 @@ export default function App() {
                         allCodes={allCodes} 
                         config={config} 
                         currentPage={currentPage} 
-                        setCurrentPage={setCurrentPage} 
+                        setCurrentPage={setCurrentPage}
+                        showToast={showToast}
                     />
                 ) : (
                     <div className="empty-state">
