@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
     "jsbarcode": "^3.11.6",
+    "jspdf": "^2.5.1",
     "qrcode-generator": "^1.4.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
