@@ -1,13 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
 import JsBarcode from 'jsbarcode';
 import qrcode from 'qrcode-generator';
+import html2canvas from 'html2canvas';
 
 const unitToPx = { px: 1, mm: 3.7795, cm: 37.795, inch: 96, pt: 1.333 };
 const convertToPx = (value, unit) => Math.round(value * (unitToPx[unit] || 1));
 
 export default function BarcodeItem({ code, index, config, isPrint = false }) {
     const svgRef = useRef(null);
+    const cardRef = useRef(null);
     const [error, setError] = useState(null);
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = async () => {
+        if (!cardRef.current) return;
+        try {
+            const canvas = await html2canvas(cardRef.current, { backgroundColor: '#ffffff', scale: 2 });
+            canvas.toBlob(blob => {
+                if (blob) {
+                    navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blob })]).then(() => {
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                    });
+                }
+            }, 'image/png');
+        } catch (e) {
+            console.error('Copy failed', e);
+            // fallback to text copy
+            navigator.clipboard.writeText(code);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
 
     const isQR = config.barcodeType === 'QR';
 
@@ -64,8 +88,13 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
         }
 
         return (
-            <div className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`}>
+            <div ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
                 {!isPrint && <span className="card-index">#{index + 1}</span>}
+                {!isPrint && (
+                    <button className="copy-btn" onClick={handleCopy} title="Copy Image">
+                        {copied ? '✅' : '📋'}
+                    </button>
+                )}
                 {error ? (
                     <p style={{ color: '#ff5050', fontSize: '0.8rem', padding: '12px' }}>❌ {error}</p>
                 ) : (
@@ -87,8 +116,13 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
     }
 
     return (
-        <div className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`}>
+        <div ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
             {!isPrint && <span className="card-index">#{index + 1}</span>}
+            {!isPrint && (
+                <button className="copy-btn" onClick={handleCopy} title="Copy Image">
+                    {copied ? '✅' : '📋'}
+                </button>
+            )}
             {error ? (
                 <p style={{ color: '#ff5050', fontSize: '0.8rem', padding: '12px' }}>❌ {error}</p>
             ) : (
