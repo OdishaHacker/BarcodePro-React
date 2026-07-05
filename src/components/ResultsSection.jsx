@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BarcodeItem from './BarcodeItem';
+import Download from './Download';
 
-export default function ResultsSection({ allCodes, config, currentPage, setCurrentPage }) {
+export default function ResultsSection({ allCodes, config, currentPage, setCurrentPage, showToast }) {
+    const [showDownload, setShowDownload] = useState(false);
+
     if (allCodes.length === 0) return null;
 
     const printBarcodes = () => {
@@ -20,6 +23,7 @@ export default function ResultsSection({ allCodes, config, currentPage, setCurre
                     <span className="results-count">{allCodes.length}</span>
                 </div>
                 <div className="results-actions">
+                    <button className="btn btn-outline btn-sm" onClick={() => setShowDownload(true)}>⬇️ Download</button>
                     <button className="btn btn-print btn-sm" onClick={printBarcodes}>🖨️ Print</button>
                 </div>
             </div>
@@ -47,6 +51,8 @@ export default function ResultsSection({ allCodes, config, currentPage, setCurre
                     </div>
                 ))}
             </div>
+            
+            {showDownload && <Download onClose={() => setShowDownload(false)} showToast={showToast} />}
         </div>
     );
 }
