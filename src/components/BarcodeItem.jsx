@@ -6,24 +6,48 @@ import html2canvas from 'html2canvas';
 const unitToPx = { px: 1, mm: 3.7795, cm: 37.795, inch: 96, pt: 1.333 };
 const convertToPx = (value, unit) => Math.round(value * (unitToPx[unit] || 1));
 
-export default function BarcodeItem({ code, index, config, isPrint = false }) {
+const BarcodeItem = React.memo(function BarcodeItem({ code, index, config, isPrint = false }) {
     const svgRef = useRef(null);
     const cardRef = useRef(null);
     const [error, setError] = useState(null);
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
-        const printElement = document.getElementById(`print-barcode-${index}`);
-        if (!printElement) return;
+        if (!cardRef.current) return;
         
-        const printArea = document.querySelector('.print-area');
-        const oldDisplay = printArea ? printArea.style.display : '';
-        if (printArea) printArea.style.display = 'block';
+        // temporarily force the card to look like a print version
+        const originalBg = cardRef.current.style.background;
+        const originalBorder = cardRef.current.style.border;
+        cardRef.current.style.background = '#ffffff';
+        cardRef.current.style.border = 'none';
 
         try {
-            const canvas = await html2canvas(printElement, { backgroundColor: '#ffffff', scale: 2 });
+            const canvas = await html2canvas(cardRef.current, { 
+                backgroundColor: '#ffffff', 
+                scale: 3,
+                logging: false,
+                onclone: (documentClone) => {
+                    // Force SVG lines to be black in the clone
+                    const clonedCard = documentClone.getElementById(cardRef.current.id);
+                    if (clonedCard) {
+                        const svg = clonedCard.querySelector('svg');
+                        if (svg) {
+                            svg.querySelectorAll('rect, path').forEach(el => {
+                                if (el.getAttribute('fill') === '#e8e8f0') {
+                                    el.setAttribute('fill', '#000000');
+                                }
+                            });
+                        }
+                        const qr = clonedCard.querySelector('.qr-wrapper');
+                        if (qr) {
+                            qr.style.filter = 'none';
+                        }
+                    }
+                }
+            });
             
-            if (printArea) printArea.style.display = oldDisplay;
+            cardRef.current.style.background = originalBg;
+            cardRef.current.style.border = originalBorder;
             
             canvas.toBlob(blob => {
                 if (blob) {
@@ -34,7 +58,8 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
                 }
             }, 'image/png');
         } catch (e) {
-            if (printArea) printArea.style.display = oldDisplay;
+            cardRef.current.style.background = originalBg;
+            cardRef.current.style.border = originalBorder;
             console.error('Copy failed', e);
             // fallback to text copy
             navigator.clipboard.writeText(code);
@@ -99,9 +124,9 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
 
         return (
             <div id={isPrint ? `print-barcode-${index}` : `barcode-${index}`} ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
-                {!isPrint && <span className="card-index">#{index + 1}</span>}
+                {!isPrint && <span className="card-index" data-html2canvas-ignore="true">#{index + 1}</span>}
                 {!isPrint && (
-                    <button className="copy-btn" onClick={handleCopy} title="Copy Image">
+                    <button className="copy-btn" onClick={handleCopy} title="Copy Image" data-html2canvas-ignore="true">
                         {copied ? '✅' : '📋'}
                     </button>
                 )}
@@ -127,9 +152,9 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
 
     return (
         <div id={isPrint ? `print-barcode-${index}` : `barcode-${index}`} ref={cardRef} className={`barcode-card ${isPrint ? (config.showBorder ? 'with-border' : 'no-border') : ''}`} style={{ position: 'relative' }}>
-            {!isPrint && <span className="card-index">#{index + 1}</span>}
+            {!isPrint && <span className="card-index" data-html2canvas-ignore="true">#{index + 1}</span>}
             {!isPrint && (
-                <button className="copy-btn" onClick={handleCopy} title="Copy Image">
+                <button className="copy-btn" onClick={handleCopy} title="Copy Image" data-html2canvas-ignore="true">
                     {copied ? '✅' : '📋'}
                 </button>
             )}
@@ -140,4 +165,6 @@ export default function BarcodeItem({ code, index, config, isPrint = false }) {
             )}
         </div>
     );
-}
+});
+
+export default BarcodeItem;

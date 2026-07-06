@@ -21,7 +21,7 @@ const typeInfoMap = {
     QR:     { icon: '📱', text: '<strong>QR Code</strong> — 2D barcode scannable by any smartphone camera. Supports text, URLs, numbers, and any character. Up to 4,296 characters.' }
 };
 
-export default function ConfigPanel({ config, updateConfig }) {
+const ConfigPanel = React.memo(function ConfigPanel({ config, updateConfig }) {
     const isQR = config.barcodeType === 'QR';
     const typeInfo = typeInfoMap[config.barcodeType];
 
@@ -193,4 +193,6 @@ export default function ConfigPanel({ config, updateConfig }) {
             </div>
         </>
     );
-}
+});
+
+export default ConfigPanel;

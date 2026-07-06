@@ -53,7 +53,7 @@ export default function BlogPage({ slug, onNavigate }) {
             {/* Article Image */}
             {article.image && (
                 <div className="blog-article-image" style={{ marginBottom: '30px', borderRadius: '12px', overflow: 'hidden' }}>
-                    <img src={article.image} alt={article.title} style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    <img src={article.image} alt={article.title} loading="lazy" style={{ width: '100%', height: 'auto', display: 'block' }} />
                 </div>
             )}
 

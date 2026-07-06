@@ -1,22 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
 import './index.css';
 
-// Components
+// Core Components
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ConfigPanel from './components/ConfigPanel';
-import ResultsSection from './components/ResultsSection';
 
-// Modes
-import SingleBarcode from './components/modes/SingleBarcode';
-import BulkBarcode from './components/modes/BulkBarcode';
-import SequentialBarcode from './components/modes/SequentialBarcode';
-import ImportBarcode from './components/modes/ImportBarcode';
-import RandomBarcode from './components/modes/RandomBarcode';
+// Lazy Loaded Components (Code Splitting for Lightweight Performance)
+const ResultsSection = lazy(() => import('./components/ResultsSection'));
+const SingleBarcode = lazy(() => import('./components/modes/SingleBarcode'));
+const BulkBarcode = lazy(() => import('./components/modes/BulkBarcode'));
+const SequentialBarcode = lazy(() => import('./components/modes/SequentialBarcode'));
+const ImportBarcode = lazy(() => import('./components/modes/ImportBarcode'));
+const RandomBarcode = lazy(() => import('./components/modes/RandomBarcode'));
+const BlogList = lazy(() => import('./blog/BlogList'));
+const BlogPage = lazy(() => import('./blog/BlogPage'));
 
-// Blog
-import BlogList from './blog/BlogList';
-import BlogPage from './blog/BlogPage';
+// Loader Component
+const Loader = () => (
+    <div className="lazy-loader">
+        <div className="loader-spinner"></div>
+        <p>Loading module...</p>
+    </div>
+);
 
 function getRouteFromHash() {
     const hash = window.location.hash.replace('#/', '') || 'home';
@@ -70,9 +76,9 @@ export default function App() {
         showBorder: true,
     });
 
-    const updateConfig = (key, value) => {
+    const updateConfig = useCallback((key, value) => {
         setConfig(prev => ({ ...prev, [key]: value }));
-    };
+    }, []);
 
     const [currentMode, setCurrentMode] = useState('single');
     const [allCodes, setAllCodes] = useState([]);
@@ -108,7 +114,9 @@ export default function App() {
             <div className="app-wrapper">
                 <Header resetAll={resetAll} navigate={navigate} />
                 <div className="main-container blog-container">
-                    <BlogList onNavigate={navigate} />
+                    <Suspense fallback={<Loader />}>
+                        <BlogList onNavigate={navigate} />
+                    </Suspense>
                 </div>
                 <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.msg}</div>
                 <Footer />
@@ -121,7 +129,9 @@ export default function App() {
             <div className="app-wrapper">
                 <Header resetAll={resetAll} navigate={navigate} />
                 <div className="main-container blog-container">
-                    <BlogPage slug={route.slug} onNavigate={navigate} />
+                    <Suspense fallback={<Loader />}>
+                        <BlogPage slug={route.slug} onNavigate={navigate} />
+                    </Suspense>
                 </div>
                 <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.msg}</div>
                 <Footer />
@@ -150,22 +160,26 @@ export default function App() {
                         ))}
                     </div>
 
-                    {currentMode === 'single' && <SingleBarcode onGenerate={handleGenerate} showToast={showToast} />}
-                    {currentMode === 'bulk' && <BulkBarcode onGenerate={handleGenerate} showToast={showToast} />}
-                    {currentMode === 'sequential' && <SequentialBarcode onGenerate={handleGenerate} showToast={showToast} />}
-                    {currentMode === 'import' && <ImportBarcode onGenerate={handleGenerate} showToast={showToast} />}
-                    {currentMode === 'random' && <RandomBarcode onGenerate={handleGenerate} showToast={showToast} />}
+                    <Suspense fallback={<Loader />}>
+                        {currentMode === 'single' && <SingleBarcode onGenerate={handleGenerate} showToast={showToast} />}
+                        {currentMode === 'bulk' && <BulkBarcode onGenerate={handleGenerate} showToast={showToast} />}
+                        {currentMode === 'sequential' && <SequentialBarcode onGenerate={handleGenerate} showToast={showToast} />}
+                        {currentMode === 'import' && <ImportBarcode onGenerate={handleGenerate} showToast={showToast} />}
+                        {currentMode === 'random' && <RandomBarcode onGenerate={handleGenerate} showToast={showToast} />}
+                    </Suspense>
 
                 </div>
 
                 {allCodes.length > 0 ? (
-                    <ResultsSection 
-                        allCodes={allCodes} 
-                        config={config} 
-                        currentPage={currentPage} 
-                        setCurrentPage={setCurrentPage}
-                        showToast={showToast}
-                    />
+                    <Suspense fallback={<Loader />}>
+                        <ResultsSection 
+                            allCodes={allCodes} 
+                            config={config} 
+                            currentPage={currentPage} 
+                            setCurrentPage={setCurrentPage}
+                            showToast={showToast}
+                        />
+                    </Suspense>
                 ) : (
                     <div className="empty-state">
                         <div className="empty-icon">📊</div>
