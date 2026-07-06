@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './index.css';
 
 // Components
@@ -14,7 +14,36 @@ import SequentialBarcode from './components/modes/SequentialBarcode';
 import ImportBarcode from './components/modes/ImportBarcode';
 import RandomBarcode from './components/modes/RandomBarcode';
 
+// Blog
+import BlogList from './blog/BlogList';
+import BlogPage from './blog/BlogPage';
+
+function getRouteFromHash() {
+    const hash = window.location.hash.replace('#/', '') || 'home';
+    if (hash.startsWith('blog/')) {
+        return { page: 'blog-article', slug: hash.replace('blog/', '') };
+    }
+    if (hash === 'blog') return { page: 'blog' };
+    return { page: 'home' };
+}
+
 export default function App() {
+    const [route, setRoute] = useState(getRouteFromHash());
+
+    useEffect(() => {
+        const handleHashChange = () => setRoute(getRouteFromHash());
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
+
+    const navigate = (to) => {
+        if (to === 'home') {
+            window.location.hash = '/';
+        } else {
+            window.location.hash = `/${to}`;
+        }
+    };
+
     const [toast, setToast] = useState({ msg: '', show: false });
     const showToast = (msg) => {
         setToast({ msg, show: true });
@@ -73,9 +102,36 @@ export default function App() {
         showToast('🔄 Reset complete');
     };
 
+    // Render Blog Pages
+    if (route.page === 'blog') {
+        return (
+            <div className="app-wrapper">
+                <Header resetAll={resetAll} navigate={navigate} />
+                <div className="main-container blog-container">
+                    <BlogList onNavigate={navigate} />
+                </div>
+                <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.msg}</div>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (route.page === 'blog-article') {
+        return (
+            <div className="app-wrapper">
+                <Header resetAll={resetAll} navigate={navigate} />
+                <div className="main-container blog-container">
+                    <BlogPage slug={route.slug} onNavigate={navigate} />
+                </div>
+                <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.msg}</div>
+                <Footer />
+            </div>
+        );
+    }
+
     return (
         <div className="app-wrapper">
-            <Header resetAll={resetAll} />
+            <Header resetAll={resetAll} navigate={navigate} />
 
             <div className="main-container">
                 <div className="config-panel">

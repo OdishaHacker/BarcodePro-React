@@ -1,4 +1,5 @@
 import React from 'react';
+import HelpIcon from './HelpIcon';
 
 const typeInfoMap = {
     CODE128: { icon: '📦', text: '<strong>Code 128</strong> — Most versatile barcode. Supports all ASCII characters (A-Z, a-z, 0-9, symbols). Used in shipping, logistics, inventory. No length restriction.' },
@@ -36,7 +37,7 @@ export default function ConfigPanel({ config, updateConfig }) {
 
             <div className="config-grid">
                 <div className="config-field">
-                    <label>Barcode Type</label>
+                    <label>Barcode Type <HelpIcon slug="barcode-type" /></label>
                     <select value={config.barcodeType} onChange={e => updateConfig('barcodeType', e.target.value)}>
                         <optgroup label="── Linear (1D) Barcodes ──">
                             <option value="CODE128">Code 128 — Alphanumeric</option>
@@ -62,7 +63,7 @@ export default function ConfigPanel({ config, updateConfig }) {
                     </select>
                 </div>
                 <div className="config-field">
-                    <label>Columns Per Row</label>
+                    <label>Columns Per Row <HelpIcon slug="columns-per-row" /></label>
                     <select value={config.colCount} onChange={e => updateConfig('colCount', e.target.value)}>
                         <option value="1">1 Column</option>
                         <option value="2">2 Columns</option>
@@ -72,7 +73,7 @@ export default function ConfigPanel({ config, updateConfig }) {
                     </select>
                 </div>
                 <div className="config-field">
-                    <label>Barcodes Per Page</label>
+                    <label>Barcodes Per Page <HelpIcon slug="barcodes-per-page" /></label>
                     <div className="per-page-row">
                         <input type="number" value={config.perPage} disabled={config.perPageAll} style={{ opacity: config.perPageAll ? 0.4 : 1 }} min="1" max="500" onChange={e => updateConfig('perPage', e.target.value)} />
                         <label className="all-check">
@@ -89,23 +90,23 @@ export default function ConfigPanel({ config, updateConfig }) {
                 {!isQR && (
                     <>
                         <div className="config-field">
-                            <label>Width</label>
+                            <label>Width <HelpIcon slug="barcode-width-height" /></label>
                             <input type="number" value={config.barWidth} step="0.5" onChange={e => updateConfig('barWidth', e.target.value)} />
                         </div>
                         <div className="config-field">
-                            <label>Height</label>
+                            <label>Height <HelpIcon slug="barcode-width-height" /></label>
                             <input type="number" value={config.barHeight} onChange={e => updateConfig('barHeight', e.target.value)} />
                         </div>
                     </>
                 )}
                 {isQR && (
                     <div className="config-field">
-                        <label>QR Module Size</label>
+                        <label>QR Module Size <HelpIcon slug="barcode-width-height" /></label>
                         <input type="number" value={config.qrSize} min="2" max="20" onChange={e => updateConfig('qrSize', e.target.value)} />
                     </div>
                 )}
                 <div className="config-field">
-                    <label>Measurement Unit</label>
+                    <label>Measurement Unit <HelpIcon slug="measurement-unit" /></label>
                     <select value={config.globalUnit} onChange={e => updateConfig('globalUnit', e.target.value)}>
                         <option value="px">px</option>
                         <option value="mm">mm</option>
@@ -120,7 +121,7 @@ export default function ConfigPanel({ config, updateConfig }) {
                 <div className="size-controls">
                     <div className="section-label"><span className="label-icon">🔤</span> Fonts</div>
                     <div className="config-field">
-                        <label>Font Family</label>
+                        <label>Font Family <HelpIcon slug="font-settings" /></label>
                         <select value={config.fontFamily} onChange={e => updateConfig('fontFamily', e.target.value)}>
                             <option value="Inter">Inter (Default)</option>
                             <option value="Arial">Arial</option>
@@ -129,15 +130,15 @@ export default function ConfigPanel({ config, updateConfig }) {
                         </select>
                     </div>
                     <div className="config-field">
-                        <label>Font Size (px)</label>
+                        <label>Font Size (px) <HelpIcon slug="font-settings" /></label>
                         <input type="number" value={config.fontSize} onChange={e => updateConfig('fontSize', e.target.value)} />
                     </div>
                     <div className="config-field">
-                        <label>Text Gap ({config.textMargin}px)</label>
+                        <label>Text Gap ({config.textMargin}px) <HelpIcon slug="font-settings" /></label>
                         <input type="range" value={config.textMargin} min="0" max="50" onChange={e => updateConfig('textMargin', e.target.value)} />
                     </div>
                     <div className="config-field">
-                        <label>Text Position</label>
+                        <label>Text Position <HelpIcon slug="font-settings" /></label>
                         <select value={config.textPosition} onChange={e => updateConfig('textPosition', e.target.value)}>
                             <option value="bottom">Bottom</option>
                             <option value="top">Top</option>
@@ -147,11 +148,11 @@ export default function ConfigPanel({ config, updateConfig }) {
                 <div className="size-controls">
                     <div className="section-label"><span className="label-icon">↔️</span> Barcode Spacing</div>
                     <div className="config-field">
-                        <label>Horizontal Gap (px)</label>
+                        <label>Horizontal Gap (px) <HelpIcon slug="barcode-spacing" /></label>
                         <input type="number" value={config.hGap} onChange={e => updateConfig('hGap', e.target.value)} />
                     </div>
                     <div className="config-field">
-                        <label>Vertical Gap (px)</label>
+                        <label>Vertical Gap (px) <HelpIcon slug="barcode-spacing" /></label>
                         <input type="number" value={config.vGap} onChange={e => updateConfig('vGap', e.target.value)} />
                     </div>
                 </div>
