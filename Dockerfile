@@ -21,3 +21,5 @@ EXPOSE 80
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
+
+# Optimized for Lightweight & Fast Performance
